@@ -24,5 +24,6 @@ const enchere_sch = new mongoose.Schema({
     likes: [{ type: mongoose.Types.ObjectId, ref: "User", required: true }],
     trash: { type: Boolean, default: false }
 }, { timestamps: true })
+
 const EnchereModel = mongoose.model("Enchere", enchere_sch)
 module.exports = EnchereModel
