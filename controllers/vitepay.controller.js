@@ -16,8 +16,8 @@ exports.vitepay_callback = async (req, res) => {
                 if (!user) throw "Une erreur est survenue au niveau du serveur lors de la recuperation de l'utilisateur ou utilisateur non trouvé"
 
                 const amount_gived = user?.tmp?.montant * 100
-                let our_authenticity = `${orderID};${amount_gived};XOF;${api_secret}`;
-                our_authenticity = (CryptoJS.SHA1(our_authenticity).toString(CryptoJS.enc.Hex)).toUpperCase()
+                let our_authenticity = `${orderID};${amount_gived};XOF;${api_secret}`.toUpperCase();
+                our_authenticity = CryptoJS.SHA1(our_authenticity)
 
                 if (authenticity === our_authenticity) {
                     if (success && success == 1) {
