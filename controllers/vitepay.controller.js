@@ -22,7 +22,7 @@ exports.vitepay_callback = async (req, res) => {
 
                 // if (authenticity === our_authenticity) {
                 if (success && success == 1) {
-                    if (sandbox == 1) {
+                    if (sandbox == 1 || sandbox == 0) {
                         const res = await axios.patch("https://api-meyere.adaptable.app/api/enchere/participate-in-enchere", { orderID })
 
                         if (!res) throw "Erreur pendant la mise a jour de la base de donnée"
