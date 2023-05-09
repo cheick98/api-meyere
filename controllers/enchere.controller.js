@@ -142,9 +142,17 @@ exports.participate_in_enchere = async (req, res) => {
 
         // si l'encherisseur a choisi le prix de reserve, l'enchère sera fermée
         if (user?.tmp?.reserve_price && !isEmpty(user?.tmp?.reserve_price)) {
-            enchere.title = "tz nation"
+            enchere.title = "Logineo"
+            enchere.history.push({ buyerID, reserve_price: true, montant: enchere.reserve_price, date: new Date() })
+            enchere.enchere_status = "closed"
+
             const enchere_after_participation = await enchere.save()
-            if (!enchere_after_participation) throw "Erreur survenue au niveau du serveur"
+            if (!enchere_after_participation) throw "Erreur survenue au niveau du serveur lors de la mise a jour des données"
+
+            user?.tmp = null
+            const user_after_participate_enchere = await user.save()
+            if (!user_after_participate_enchere) throw "Erreur survenue au niveau du serveur"
+
 
             res.send({ response: 1 })
         }
@@ -181,7 +189,7 @@ exports.participate_in_enchere = async (req, res) => {
         //     }
         // }
     } catch (error) {
-        res.status(500).send({ response: 0, message: error })
+        res.send({ status: 0, message: error })
     }
 
 }
