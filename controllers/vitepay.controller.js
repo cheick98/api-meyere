@@ -1,6 +1,6 @@
 const EnchereModel = require("../models/enchere.model")
 const UserModel = require("../models/user.model")
-import CryptoJS from 'crypto-js'
+import { SHA1 } from 'crypto-js'
 
 exports.vitepay_callback = async (req, res) => {
     try {
@@ -17,7 +17,7 @@ exports.vitepay_callback = async (req, res) => {
 
                 const amount_gived = user?.tmp?.montant * 100
                 let our_authenticity = `${orderID};${amount_gived};XOF;${api_secret}`;
-                our_authenticity = (CryptoJS.SHA1(our_authenticity).toString(CryptoJS.enc.Hex)).toUpperCase()
+                our_authenticity = (SHA1(our_authenticity).toString()).toUpperCase()
 
                 if (authenticity === our_authenticity) {
                     if (success && success == 1) {
