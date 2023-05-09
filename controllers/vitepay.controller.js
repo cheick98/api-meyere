@@ -29,7 +29,7 @@ exports.vitepay_callback = async (req, res) => {
                 if (success && success == 1) {
                     if (sandbox == 1 || sandbox == 0) {
                         if (user?.tmp?.reserve_price && user?.tmp?.reserve_price === true) {
-                            enchere.title = "Logineo"
+                            enchere.title = "Logineo";
                             enchere.history.push({ buyerID: orderID, reserve_price: true, real_montant: enchere.reserve_price, montant: enchere.reserve_price, date: new Date().getTime() })
                             enchere.enchere_status = "closed"
 
