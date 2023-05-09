@@ -149,7 +149,7 @@ exports.participate_in_enchere = async (req, res) => {
             const enchere_after_participation = await enchere.save()
             if (!enchere_after_participation) throw "Erreur survenue au niveau du serveur lors de la mise a jour des données"
 
-            user?.tmp = {}
+            user.tmp = undefined
             const user_after_participate_enchere = await user.save()
             if (!user_after_participate_enchere) throw "Erreur survenue au niveau du serveur"
 
