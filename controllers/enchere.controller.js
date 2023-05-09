@@ -143,7 +143,7 @@ exports.participate_in_enchere = async (req, res) => {
         // si l'encherisseur a choisi le prix de reserve, l'enchère sera fermée
         if (user?.tmp?.reserve_price && !isEmpty(user?.tmp?.reserve_price)) {
             enchere.title = "Logineo"
-            enchere.history.push({ buyerID, reserve_price: true, montant: enchere.reserve_price, date: new Date() })
+            enchere.history.push({ buyerID, reserve_price: true, real_montant: enchere.reserve_price, montant: enchere.reserve_price, date: new Date().getTime() })
             enchere.enchere_status = "closed"
 
             const enchere_after_participation = await enchere.save()
