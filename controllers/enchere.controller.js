@@ -140,11 +140,14 @@ exports.participate_in_enchere = async (req, res) => {
         const enchere = await EnchereModel.findById(user?.tmp?.enchereID)
         if (!enchere) throw "Enchère non trouvé"
 
-        enchere.title = "tz nation"
-        const enchere_after_participation = await enchere.save()
-        if (!enchere_after_participation) throw "Erreur survenue au niveau du serveur"
+        // si l'encherisseur a choisi le prix de reserve, l'enchère sera fermée
+        if (user?.tmp?.reserve_price && !isEmpty(user?.tmp?.reserve_price)) {
+            enchere.title = "tz nation"
+            const enchere_after_participation = await enchere.save()
+            if (!enchere_after_participation) throw "Erreur survenue au niveau du serveur"
 
-        res.send({ response: 1 })
+            res.send({ response: 1 })
+        }
 
 
         // if (!isValidObjectId(req.params.id) || !isValidObjectId(buyerID)) return res.status(400).json({ message: "(enchère ID ou buyerID) est(sont) invalide(s)." })
