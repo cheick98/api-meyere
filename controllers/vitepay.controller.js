@@ -30,7 +30,7 @@ exports.vitepay_callback = async (req, res) => {
                             const enchere_updated = await EnchereModel.findByIdAndUpdate(user.tmp.enchereID, { title: "tz" }, { new: true })
                             if (!enchere_updated) throw "Une erreur est survenue lors de la mise a jour de l'enchère!"
 
-                            res.send({ status: "1" })
+                            res.send({ status: "1" });
                         }
                     } else if (failure && failure == 1) {
                         const enchere_updated = await EnchereModel.findByIdAndUpdate(user.tmp.enchereID, { title: "kougnon" }, { new: true })
