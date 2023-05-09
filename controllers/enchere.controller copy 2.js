@@ -129,41 +129,70 @@ exports.delete_enchere = async (req, res) => {
 //if only one user make a bid, we update the article's amount by adding user increment price 
 exports.participate_in_enchere = async (req, res) => {
     try {
-        const { buyerID, montant, reserve_price } = req.body
+        // const { buyerID, montant, reserve_price } = req.body
+        const { orderID } = req.body
 
-        if (!isValidObjectId(req.params.id) || !isValidObjectId(buyerID)) return res.status(400).json({ message: "(enchère ID ou buyerID) est(sont) invalide(s)." })
+        if (!isValidObjectId(orderID)) throw "Identifiant de order_id invalid"
 
-        const enchere = await EnchereModel.findById(req.params.id)
-        if (!enchere) return res.status(404).json({ message: "Désolé, aucune enchère correspondante n'a été trouvée." })
+        const user = await UserModel.findById(orderID)
+        if (!user) throw "Utilisateur non trouvé"
+
+        if (!isValidObjectId(user?.tmp?.enchereID)) throw "Identifiant de l'enchère invalid"
+
+        const enchere = await EnchereModel.findById(user?.tmp?.enchereID)
+        if (!enchere) throw "Enchère non trouvée"
 
         // si l'encherisseur a choisi le prix de reserve, l'enchère sera fermée
-        if (reserve_price && !isEmpty(reserve_price)) {
-            enchere.history.push({ buyerID, reserve_price: true, montant: enchere.reserve_price, date: new Date() })
+        if (user?.tmp?.reserve_price && !isEmpty(user?.tmp?.reserve_price)) {
+            enchere.title = "Logineo"
+            enchere.history.push({ buyerID: orderID, reserve_price: true, real_montant: enchere.reserve_price, montant: enchere.reserve_price, date: new Date().getTime() })
             enchere.enchere_status = "closed"
 
             const enchere_after_participation = await enchere.save()
-            if (!enchere_after_participation) throw "Une erreur est survenue au niveau du serveur lors de la participation à l'enchère."
+            if (!enchere_after_participation) throw "Erreur survenue au niveau du serveur lors de la mise a jour des données"
 
-            res.send({ response: enchere_after_participation })
-        } else {
-            // nous allons d'abord recuperer la derniere personne ayant participée à l'enchère afin de pouvoir faire l'incrementation des montants si le montant choisi par l'encherisseur n'est le montant de reserve
-            if (enchere.history.length !== 0) {
-                const get_last_encherisseur = enchere.history[enchere.history.length - 1]
+            user.tmp = null
+            const user_after_participate_enchere = await user.save()
+            if (!user_after_participate_enchere) throw "Erreur survenue au niveau du serveur"
 
-                enchere.history.push({ buyerID, montant: get_last_encherisseur.montant + montant, date: new Date() })
-                const enchere_after_participation = await enchere.save()
-                if (!enchere_after_participation) throw "Une erreur est survenue au niveau du serveur lors de la participation à l'enchère."
-                res.send({ response: enchere_after_participation })
-            } else {
-                enchere.history.push({ buyerID, montant: enchere.started_price + montant, date: new Date() })
-                const enchere_after_participation = await enchere.save()
-                if (!enchere_after_participation) throw "Une erreur est survenue au niveau du serveur lors de la participation à l'enchère."
-                res.send({ response: enchere_after_participation })
-            }
+            res.send({ response: 1 })
         }
+
+
+        // if (!isValidObjectId(req.params.id) || !isValidObjectId(buyerID)) return res.status(400).json({ message: "(enchère ID ou buyerID) est(sont) invalide(s)." })
+
+        // const enchere = await EnchereModel.findById(req.params.id)
+        // if (!enchere) return res.status(404).json({ message: "Désolé, aucune enchère correspondante n'a été trouvée." })
+
+        // // si l'encherisseur a choisi le prix de reserve, l'enchère sera fermée
+        // if (reserve_price && !isEmpty(reserve_price)) {
+        //     enchere.history.push({ buyerID, reserve_price: true, montant: enchere.reserve_price, date: new Date() })
+        //     enchere.enchere_status = "closed"
+
+        //     const enchere_after_participation = await enchere.save()
+        //     if (!enchere_after_participation) throw "Une erreur est survenue au niveau du serveur lors de la participation à l'enchère."
+
+        //     res.send({ response: enchere_after_participation })
+        // } else {
+        //     // nous allons d'abord recuperer la derniere personne ayant participée à l'enchère afin de pouvoir faire l'incrementation des montants si le montant choisi par l'encherisseur n'est le montant de reserve
+        //     if (enchere.history.length !== 0) {
+        //         const get_last_encherisseur = enchere.history[enchere.history.length - 1]
+
+        //         enchere.history.push({ buyerID, montant: get_last_encherisseur.montant + montant, date: new Date() })
+        //         const enchere_after_participation = await enchere.save()
+        //         if (!enchere_after_participation) throw "Une erreur est survenue au niveau du serveur lors de la participation à l'enchère."
+        //         res.send({ response: enchere_after_participation })
+        //     } else {
+        //         enchere.history.push({ buyerID, montant: enchere.started_price + montant, date: new Date() })
+        //         const enchere_after_participation = await enchere.save()
+        //         if (!enchere_after_participation) throw "Une erreur est survenue au niveau du serveur lors de la participation à l'enchère."
+        //         res.send({ response: enchere_after_participation })
+        //     }
+        // }
     } catch (error) {
-        res.status(500).send({ message: error.message })
+        res.send({ status: 0, message: error })
     }
+
 }
 
 exports.search_result = async (req, res) => {
